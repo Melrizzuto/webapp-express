@@ -14,7 +14,7 @@ import moviesRouter from "./routers/moviesRouter.js";
 
 // Define static assets path
 // Create public directory inside the root directory (mkdir public)
-app.use(express.static("public")); // Middleware to define the public folder for static files, must be set before routes
+app.use('/images', express.static("public")); // Middleware to define the public folder for static files, must be set before routes
 
 // Add root route
 app.get("/", (req, res) => {
@@ -23,9 +23,6 @@ app.get("/", (req, res) => {
 
 // Other routes
 app.use("/movies", moviesRouter);
-
-// gestione asset statici
-app.use('/images', express.static("public"));
 
 // Add middleware for CORS policy
 app.use(corsPolicy);
