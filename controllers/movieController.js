@@ -30,7 +30,15 @@ function show(req, res) {
     if (isNaN(id)) {
         return res.status(400).json({ error: "ID non valido" });
     }
-    const sql = `SELECT movies.*, AVG(reviews.vote) AS vote_average  FROM movies JOIN reviews ON reviews.movie_id = movies.id WHERE movies.id = ? GROUP BY reviews.movie_id`
+
+    const sql = `
+        SELECT movies.*, AVG(reviews.vote) AS vote_average
+        FROM movies
+        JOIN reviews ON reviews.movie_id = movies.id
+        WHERE movies.id = ?
+        GROUP BY reviews.movie_id
+    `;
+
     connection.query(sql, [id], (err, results) => {
         if (err) {
             return res.status(500).json({ error: "Errore nella query del database" });
@@ -40,16 +48,19 @@ function show(req, res) {
         if (!item) {
             return res.status(404).json({ error: "Movie non trovato" });
         }
-        const sqlReviews = "SELECT * FROM `reviews` WHERE movies_id` = ?";
-        connection.query(sqlReviews, [id], (error, reviews) => {
-            if (error) res.status(500).json({ error: "Errore del server" });
-            item.reviews = reviews;
-            res.json({ success: true, item });
-        })
 
+        const sqlReviews = "SELECT * FROM reviews WHERE movie_id = ?";
+
+        connection.query(sqlReviews, [id], (error, reviews) => {
+            if (error) {
+                return res.status(500).json({ error: "Errore del server" });
+            }
+
+            item.reviews = reviews; // Aggiunta delle recensioni al film
+            res.json({ success: true, item });
+        });
     });
 }
-
 // Store - Crea un nuovo movie
 function store(req, res) {
     let newId = 0;
