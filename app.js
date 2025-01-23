@@ -24,6 +24,9 @@ app.get("/", (req, res) => {
 // Other routes
 app.use("/movies", moviesRouter);
 
+// gestione asset statici
+app.use('/images', express.static("public"));
+
 // Add middleware for CORS policy
 app.use(corsPolicy);
 
