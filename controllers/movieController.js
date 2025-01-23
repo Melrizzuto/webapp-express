@@ -1,5 +1,5 @@
 import connection from "../connection.js";
-// import CustomError from "../classes/CustomError";
+import CustomError from "../classes/CustomError.js";
 
 // Index - Leggi tutti i movies
 function index(req, res) {
