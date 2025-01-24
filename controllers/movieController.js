@@ -1,5 +1,4 @@
 import connection from "../connection.js";
-import CustomError from "../classes/CustomError.js";
 
 // Index - Leggi tutti i movies
 function index(req, res) {
@@ -8,8 +7,6 @@ function index(req, res) {
         if (err) {
             return res.status(500).json({ error: "Database query failed" });
         }
-
-        console.log(results);
 
         const response = {
             info: {
@@ -24,7 +21,6 @@ function index(req, res) {
 
 // Show - Leggi un singolo movie
 function show(req, res) {
-    // console.log("Richiesta ricevuta per ID:", req.params.id);
     const id = parseInt(req.params.id);
 
     if (isNaN(id)) {
@@ -34,7 +30,7 @@ function show(req, res) {
     const sql = `
         SELECT movies.*, AVG(reviews.vote) AS vote_average
         FROM movies
-        JOIN reviews ON reviews.movie_id = movies.id
+        LEFT JOIN reviews ON reviews.movie_id = movies.id
         WHERE movies.id = ?
         GROUP BY reviews.movie_id
     `;
@@ -50,10 +46,9 @@ function show(req, res) {
         }
 
         const sqlReviews = "SELECT * FROM reviews WHERE movie_id = ?";
-
         connection.query(sqlReviews, [id], (error, reviews) => {
             if (error) {
-                return res.status(500).json({ error: "Errore del server" });
+                return res.status(500).json({ error: "Errore nel recupero delle recensioni" });
             }
 
             item.reviews = reviews; // Aggiunta delle recensioni al film
@@ -61,6 +56,7 @@ function show(req, res) {
         });
     });
 }
+
 // Store - Crea un nuovo movie
 function store(req, res) {
     let newId = 0;
@@ -97,12 +93,18 @@ function destroy(req, res) {
     const id = parseInt(req.params.id);
     const sql = "DELETE FROM movies WHERE id = ?";
 
-    connection.query(sql, [id], (err) => {
+    connection.query(sql, [id], (err, result) => {
         if (err) {
             return res.status(500).json({ error: "Errore nella query di eliminazione" });
         }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: "Movie non trovato" });
+        }
+
         res.sendStatus(204);
     });
 }
 
 export { index, show, store, update, destroy };
+

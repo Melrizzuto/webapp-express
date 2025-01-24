@@ -9,8 +9,13 @@ const port = process.env.PORT || 3000;
 // Other imports
 import errorHandler from "./middlewares/errorsHandler.js";
 import notFound from "./middlewares/notFound.js";
-import corsPolicy from "./middlewares/corsPolicy.js";
 import moviesRouter from "./routers/moviesRouter.js";
+import cors from 'cors';
+
+// Consenti richieste da 'http://localhost:5173'
+app.use(cors({
+    origin: 'http://localhost:5173'
+}));
 
 // Define static assets path
 // Create public directory inside the root directory (mkdir public)
@@ -23,9 +28,6 @@ app.get("/", (req, res) => {
 
 // Other routes
 app.use("/movies", moviesRouter);
-
-// Add middleware for CORS policy
-app.use(corsPolicy);
 
 // Middleware for general server errors
 app.use(errorHandler);
