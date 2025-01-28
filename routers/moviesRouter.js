@@ -22,7 +22,7 @@ router.get("/:id", show);
 router.post("/", store);
 
 // store create review
-router.post("/", storeReview);
+router.post("/:movieId/reviews", storeReview);
 
 // Update - Update totale
 router.put("/:id", update);
