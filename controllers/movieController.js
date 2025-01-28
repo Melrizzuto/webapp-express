@@ -72,40 +72,31 @@ function store(req, res) {
 }
 
 function storeReview(req, res) {
-    // recuperiamo i parametri dalla richiesta
+    // Controlla se req.body esiste e contiene i dati necessari
+    if (!req.body || !req.body.text || !req.body.name || !req.body.vote) {
+        return res.status(400).json({ error: "Dati mancanti. Assicurati di inviare 'text', 'name' e 'vote'." });
+    }
+
+    const { text, name, vote, } = req.body;
+
+    // Recuperiamo l'id
     const { id } = req.params;
 
-    // verifica che l'ID sia valido
-    if (!id || isNaN(parseInt(id))) {
-        return res.status(400).json({ error: "Invalid movie ID" });
-    }
-
-    // Recuperiamo il body
-    const { text, name, vote } = req.body;
-
-    // Validazione del body
-    if (!text || !name || vote === undefined || isNaN(parseFloat(vote))) {
-        return res.status(400).json({
-            error: "Invalid input.",
-        });
-    }
-
-    // Prepariamo la query
-    const sql = "INSERT INTO reviews (text, name, vote, book_id) VALUES (?, ?, ?, ?)";
+    // Prepariamo la query con i campi da popolare
+    const sql = "INSERT INTO reviews (text, name, vote, movie_id) VALUES (?, ?, ?, ?)";
 
     // Eseguiamo la query
     connection.query(sql, [text, name, vote, id], (err, results) => {
         if (err) {
-            console.error("Database error:", err);
+            console.error("Errore nella query:", err);
             return res.status(500).json({ error: "Database query failed" });
         }
-
-        res.status(201).json({
-            message: "Review added",
-            id: results.insertId,
-        });
+        console.log(results); // Log dei risultati per debug
+        res.status(201).json({ message: "Review added", id: results.insertId });
     });
 }
+
+
 
 // Update - Modifica un movie esistente
 function update(req, res) {

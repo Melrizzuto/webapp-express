@@ -1,41 +1,34 @@
-// Import express
 import express from "express";
-// Create a server instance
-const app = express();
-
-// Set the port
-const port = process.env.PORT || 3000;
-
-// Other imports
+import cors from 'cors';
+import { json } from "express";
+import moviesRouter from "./routers/moviesRouter.js";
 import errorHandler from "./middlewares/errorsHandler.js";
 import notFound from "./middlewares/notFound.js";
-import moviesRouter from "./routers/moviesRouter.js";
-import cors from 'cors';
+
+const app = express();
+const port = process.env.PORT || 3000;
+
+// Middleware per il parsing del corpo delle richieste JSON
+app.use(json()); // Aggiungi questo middleware per gestire i dati in formato JSON
 
 // Consenti richieste da 'http://localhost:5173'
 app.use(cors({
     origin: 'http://localhost:5173'
 }));
 
-// Define static assets path
-// Create public directory inside the root directory (mkdir public)
-app.use('/images', express.static("public/images")); // Middleware to define the public folder for static files, must be set before routes
+// Altri middleware
+app.use('/images', express.static("public/images")); // Middleware per definire la cartella pubblica per i file statici
 
-// Add root route
-app.get("/", (req, res) => {
-    res.send("Home Page");
-});
-
-// Other routes
+// Rotte
 app.use("/movies", moviesRouter);
 
-// Middleware for general server errors
+// Middleware per gli errori generali
 app.use(errorHandler);
 
-// Middleware for resource not found
+// Middleware per le risorse non trovate
 app.use(notFound);
 
-// Server must listen on the specified host and port
+// Avvio del server
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
