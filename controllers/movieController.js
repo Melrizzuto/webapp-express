@@ -71,6 +71,42 @@ function store(req, res) {
     res.json({ success: true, item: newItem });
 }
 
+function storeReview(req, res) {
+    // recuperiamo i parametri dalla richiesta
+    const { id } = req.params;
+
+    // verifica che l'ID sia valido
+    if (!id || isNaN(parseInt(id))) {
+        return res.status(400).json({ error: "Invalid movie ID" });
+    }
+
+    // Recuperiamo il body
+    const { text, name, vote } = req.body;
+
+    // Validazione del body
+    if (!text || !name || vote === undefined || isNaN(parseFloat(vote))) {
+        return res.status(400).json({
+            error: "Invalid input.",
+        });
+    }
+
+    // Prepariamo la query
+    const sql = "INSERT INTO reviews (text, name, vote, book_id) VALUES (?, ?, ?, ?)";
+
+    // Eseguiamo la query
+    connection.query(sql, [text, name, vote, id], (err, results) => {
+        if (err) {
+            console.error("Database error:", err);
+            return res.status(500).json({ error: "Database query failed" });
+        }
+
+        res.status(201).json({
+            message: "Review added",
+            id: results.insertId,
+        });
+    });
+}
+
 // Update - Modifica un movie esistente
 function update(req, res) {
     const id = parseInt(req.params.id);
@@ -106,5 +142,5 @@ function destroy(req, res) {
     });
 }
 
-export { index, show, store, update, destroy };
+export { index, show, store, storeReview, update, destroy };
 
