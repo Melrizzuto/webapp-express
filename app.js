@@ -17,7 +17,7 @@ app.use(cors({
 }));
 
 // Altri middleware
-app.use('/images', express.static("public/images")); // Middleware per definire la cartella pubblica per i file statici
+app.use(express.static("public")); // Middleware per definire la cartella pubblica per i file statici
 
 // Rotte
 app.use("/movies", moviesRouter);
